@@ -39,6 +39,26 @@ const UploadPage = () => {
     }
   }, []);
 
+  const processLine = (line: string, accumulatedResult: string) => {
+    if (line.startsWith("data:")) {
+      const data = line.replace("data: ", "").trim();
+      if (data === "[DONE]") {
+        setIsLoading(false);
+        return accumulatedResult;
+      }
+      try {
+        const parsedData = JSON.parse(data);
+        if (parsedData.response) {
+          accumulatedResult += parsedData.response;
+          setResult(accumulatedResult);
+        }
+      } catch (err) {
+        console.error("Error parsing JSON chunk:", err);
+      }
+    }
+    return accumulatedResult;
+  };
+
   const streamResponse = async (reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder) => {
     let done = false;
     let accumulatedResult = "";
@@ -49,23 +69,9 @@ const UploadPage = () => {
       const chunk = decoder.decode(value, { stream: true });
 
       const lines = chunk.split("\n");
+      // eslint-disable-next-line no-loop-func
       lines.forEach((line) => {
-        if (line.startsWith("data:")) {
-          const data = line.replace("data: ", "").trim();
-          if (data === "[DONE]") {
-            setIsLoading(false);
-            return;
-          }
-          try {
-            const parsedData = JSON.parse(data);
-            if (parsedData.response) {
-              accumulatedResult += parsedData.response;
-              setResult(accumulatedResult);
-            }
-          } catch (err) {
-            console.error("Error parsing JSON chunk:", err);
-          }
-        }
+        accumulatedResult = processLine(line, accumulatedResult);
       });
     }
   };
@@ -99,6 +105,7 @@ const UploadPage = () => {
       console.error("Error during streaming:", error);
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jdText, pdfText]);
 
   return (
@@ -134,7 +141,6 @@ const UploadPage = () => {
         <div>
           <h2>Analysis Result:</h2>
           <MarkdownPreview source={result} style={{ padding: 16, margin: 10 }} />
-          {/* <pre>{result}</pre> */}
         </div>
       )}
     </div>
