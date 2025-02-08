@@ -1,12 +1,11 @@
 import React from "react";
 import { useAuth } from "contexts/AuthContext";
 import AuthModal from "components/AuthModal";
-import ResumeBuilder from "components/ResumeBuilder";
-// import ResumeAnalyzer from "components/ResumeAnalyzer";
+import ResumeBuilder from "pages/ResumeBuilder";
 import Header from "components/Header";
 import "styles/App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import UploadPage from "components/UploadPage";
+import UploadPage from "pages/UploadPage";
 import Home from "pages/Home";
 const App = () => {
   return (

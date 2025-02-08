@@ -3,3 +3,10 @@
     flex-direction: column;
     justify-content: center;
 }
+
+.markdown-preview {
+    padding: 16px;
+    margin: 10px;
+    max-height: 36rem;
+    overflow-y: auto;
+}

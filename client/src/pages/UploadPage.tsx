@@ -6,7 +6,9 @@ import pdfToText from "react-pdftotext";
 import TextField from "@mui/material/TextField";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MarkdownPreview from "@uiw/react-markdown-preview";
-import '../styles/upload.css';
+import "../styles/upload.css";
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -155,14 +157,15 @@ const UploadPage = () => {
           Analyze
         </Button>
       </div>
-      {isLoading && <p>Loading...</p>}
+      {isLoading && (
+        <Box sx={{ width: "100%" }}>
+          <LinearProgress />
+        </Box>
+      )}
       {result && (
         <div>
           <h2>Analysis Result:</h2>
-          <MarkdownPreview
-            source={result}
-            style={{ padding: 16, margin: 10 }}
-          />
+          <MarkdownPreview source={result} className="markdown-preview" />
         </div>
       )}
     </div>
