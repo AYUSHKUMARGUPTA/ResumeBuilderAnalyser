@@ -5,8 +5,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import pdfToText from "react-pdftotext";
 import TextField from "@mui/material/TextField";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
-import MarkdownPreview from '@uiw/react-markdown-preview';
-
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import '../styles/upload.css';
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -25,19 +25,24 @@ const UploadPage = () => {
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAnalyze = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const file = event.target.files[0];
-      pdfToText(file)
-        .then((text) => {
-          setPdfText(text);
-          console.log("PDF Text", text);
-        })
-        .catch((error) => console.error("Failed to extract text from pdf", error));
-    } else {
-      alert("Please upload a resume to analyze.");
-    }
-  }, []);
+  const handleAnalyze = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files) {
+        const file = event.target.files[0];
+        pdfToText(file)
+          .then((text) => {
+            setPdfText(text);
+            console.log("PDF Text", text);
+          })
+          .catch((error) =>
+            console.error("Failed to extract text from pdf", error)
+          );
+      } else {
+        alert("Please upload a resume to analyze.");
+      }
+    },
+    []
+  );
 
   const processLine = (line: string, accumulatedResult: string) => {
     if (line.startsWith("data:")) {
@@ -59,7 +64,10 @@ const UploadPage = () => {
     return accumulatedResult;
   };
 
-  const streamResponse = async (reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder) => {
+  const streamResponse = async (
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+    decoder: TextDecoder
+  ) => {
     let done = false;
     let accumulatedResult = "";
 
@@ -83,13 +91,16 @@ const UploadPage = () => {
 
       setIsLoading(true);
 
-      const response = await fetch("http://localhost:8080/api/resume-analyzer/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ jd, extractedText }),
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/resume-analyzer/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ jd, extractedText }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -105,42 +116,53 @@ const UploadPage = () => {
       console.error("Error during streaming:", error);
       setIsLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jdText, pdfText]);
 
   return (
     <div>
       <h2>Upload Your Resume</h2>
-      <TextField
-        id="outlined-multiline-static"
-        label="JD"
-        multiline
-        value={jdText}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputText(e.target.value)}
-      />
-      <Button
-        component="label"
-        role={undefined}
-        variant="contained"
-        tabIndex={-1}
-        startIcon={<CloudUploadIcon />}
-      >
-        Upload files
-        <VisuallyHiddenInput
-          type="file"
-          accept=".pdf,.doc,.docx"
-          onChange={handleAnalyze}
-          multiple={false}
+      <div className="upload-form-container">
+        <TextField
+          id="outlined-multiline-static"
+          label="JD"
+          multiline
+          value={jdText}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setInputText(e.target.value)
+          }
         />
-      </Button>
-      <Button variant="outlined" startIcon={<QueryStatsIcon />} onClick={analyze}>
-        Analyze
-      </Button>
+        <Button
+          component="label"
+          role={undefined}
+          variant="contained"
+          tabIndex={-1}
+          startIcon={<CloudUploadIcon />}
+        >
+          Upload files
+          <VisuallyHiddenInput
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={handleAnalyze}
+            multiple={false}
+          />
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<QueryStatsIcon />}
+          onClick={analyze}
+        >
+          Analyze
+        </Button>
+      </div>
       {isLoading && <p>Loading...</p>}
       {result && (
         <div>
           <h2>Analysis Result:</h2>
-          <MarkdownPreview source={result} style={{ padding: 16, margin: 10 }} />
+          <MarkdownPreview
+            source={result}
+            style={{ padding: 16, margin: 10 }}
+          />
         </div>
       )}
     </div>

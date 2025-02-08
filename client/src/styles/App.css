@@ -1,4 +1,4 @@
-.ReactWelcome-logo {
+/* .ReactWelcome-logo {
   height: 40vmin;
   pointer-events: none;
 }
@@ -20,4 +20,10 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
+
+.page-container {
+  height: 92vh;
+  margin: 4rem 2rem 0rem 2rem;
+  width: 96%;
+} 
