@@ -1,5 +1,5 @@
 import React from "react";
-import Grid from "./DataGrid";
+import Grid from "../components/DataGrid";
 import Button from '@mui/material/Button';
 import CreateIcon from '@mui/icons-material/Create';
 const ResumeBuilder = () => {
