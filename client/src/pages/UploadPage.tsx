@@ -94,7 +94,7 @@ const UploadPage = () => {
       setIsLoading(true);
 
       const response = await fetch(
-        "http://localhost:8080/api/resume-analyzer/analyze",
+        "http://localhost:8080/api/analyze",
         {
           method: "POST",
           headers: {
