@@ -54,16 +54,18 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       axios
         .post('/auth/login', formData)
         .then(({ data: { data: accountData, token: accessToken } }) => {
-          setAccount(accountData)
-          setToken(accessToken)
-          setIsLoggedIn(true)
-          resolve(true)
+          setAccount(accountData);
+          setToken(accessToken);
+          setIsLoggedIn(true);
+          localStorage.setItem('_id', accountData._id); 
+          resolve(true);
         })
         .catch((error) => {
-          reject(error?.response?.data?.message || error.message)
-        })
-    })
-  }
+          reject(error?.response?.data?.message || error.message);
+        });
+    });
+  };
+  
 
   const logout = () => {
     setIsLoggedIn(false)

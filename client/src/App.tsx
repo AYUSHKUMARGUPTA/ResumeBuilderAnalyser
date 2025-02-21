@@ -3,6 +3,7 @@ import { useAuth } from 'contexts/AuthContext'
 import AuthModal from 'components/AuthModal'
 import ResumeBuilder from "components/ResumeBuilder";
 import ResumeAnalyzer from "components/ResumeAnalyzer";
+import ResumeDetails from "components/ResumeDetails"; 
 import Header from 'components/Header'
 import 'styles/ReactWelcome.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -18,6 +19,8 @@ const App = () => {
       <LoggedInStatus />
       <Routes>
         <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/resume-details" element={<ResumeDetails />} />
+        <Route path="/resume-details/:id" element={<ResumeDetails />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
         <Route path="/" element={<h2>Welcome to the Web App</h2>} />
       </Routes>
