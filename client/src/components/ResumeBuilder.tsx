@@ -5,6 +5,7 @@ import ResumeGrid from "./Grid"; // Ensure correct import
 import Button from "@mui/material/Button";
 import CreateIcon from "@mui/icons-material/Create";
 import { CircularProgress, Typography } from "@mui/material";
+import { useModalStore } from "store/useModalStore";
 
 // Define the Resume interface
 interface Resume {
@@ -16,6 +17,7 @@ interface Resume {
 }
 
 const ResumeBuilder: React.FC = () => {
+    const { setRowData } = useModalStore()
     const navigate = useNavigate();
     const { resume_id } = useParams();
     console.log("Resume ID:", resume_id);
@@ -77,9 +79,10 @@ const ResumeBuilder: React.FC = () => {
         navigate("/resume-details");
     };
 
-    const handleRowClick = (resume_id: string) => {
-        console.log("Navigating to resume details with ID:", resume_id);
-        navigate(`/resume-details/${resume_id}`);
+    const handleRowClick = (row_data: any) => {
+        console.log("Navigating to resume details with ID:", row_data);
+        setRowData(row_data)
+        navigate(`/resume-details/${row_data._id}`);
     };
 
     return (

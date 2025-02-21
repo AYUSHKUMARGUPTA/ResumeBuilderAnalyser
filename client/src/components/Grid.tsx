@@ -13,7 +13,7 @@ interface Resume {
 // GridProps interface
 interface GridProps {
     data: Resume[];
-    onRowClick: (_id: string) => void; 
+    onRowClick: (rowData:any) => void; 
 }
 
 const ResumeGrid: React.FC<GridProps> = ({ data, onRowClick }) => {
@@ -21,11 +21,10 @@ const ResumeGrid: React.FC<GridProps> = ({ data, onRowClick }) => {
     if (!data || data.length === 0) return <p>No resume data available.</p>;
 
     const columns: GridColDef[] = [
-        { field: "index", headerName: "#", width: 100 },
         { field: "fullName", headerName: "Full Name", width: 300 },
         { field: "resumeName", headerName: "Resume Name", width: 300 },
         {
-            field: "download",
+            field: "downloadUrl",
             headerName: "Download",
             width: 150,
             renderCell: () => (
@@ -37,23 +36,23 @@ const ResumeGrid: React.FC<GridProps> = ({ data, onRowClick }) => {
     ];
 
     // Map over the data and assign a simple sequence number as the `id`
-    const rows = data.map((resume, index) => ({
-        _id: resume._id,
-        index: index + 1, 
-        fullName: resume.fullName,
-        resumeName: resume.resumeName,
-        downloadUrl: resume.downloadUrl,
-    }));
+    // const rows = data.map((resume, index) => ({
+    //     _id: resume._id,
+    //     index: index + 1, 
+    //     fullName: resume.fullName,
+    //     resumeName: resume.resumeName,
+    //     downloadUrl: resume.downloadUrl,
+    // }));
 
     return (
         <DataGrid
-            rows={rows}
+            rows={data}
             columns={columns}
             pagination
             paginationModel={{ page: 0, pageSize: 5 }} 
             pageSizeOptions={[5]}
-            getRowId={(row) => row._id} 
-            onRowClick={(row) => onRowClick(row.row._id)} 
+            getRowId={(row) => row._id}
+            onRowClick={(row) => onRowClick(row.row)} 
         />
     );
 };

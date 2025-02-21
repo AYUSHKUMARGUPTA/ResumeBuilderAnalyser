@@ -9,11 +9,6 @@ import 'styles/ReactWelcome.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 const App = () => {
   return (
-    // <div className='App'>
-    //   <Header />
-    //   <LoggedInStatus />
-    //   <AuthModal />
-    // </div>
     <Router>
       <Header />
       <LoggedInStatus />

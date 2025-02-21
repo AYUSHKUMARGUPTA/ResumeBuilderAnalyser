@@ -1,35 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from "react-router-dom";
-import { 
-  Container, TextField, Button, Typography, Grid, Box, Accordion, AccordionSummary, AccordionDetails, IconButton 
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  IconButton,
 } from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import DeleteIcon from '@mui/icons-material/Delete';
+import Grid from '@mui/material/Grid2';
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-
-
-interface Experience {
-  company: string;
-  role: string;
-  duration: string;
-  responsibilities: string;
-}
-
-interface Education {
-  institution: string;
-  degree: string;
-  duration: string;
-}
-
-interface Project {
-  title: string;
-  description: string;
-  tech_stack: string;
-}
+import { useModalStore } from "store/useModalStore";
 
 interface FormData {
-  account_id: string;
   resumeName: string;
   fullName: string;
   email: string;
@@ -37,254 +26,179 @@ interface FormData {
   linkedin: string;
   github: string;
   portfolio: string;
-  education: Education[];
-  experience: Experience[];
-  projects: Project[];
+  education: { institution: string; degree: string; duration: string }[];
+  experience: { company: string; role: string; duration: string; responsibilities: string }[];
+  projects: { title: string; description: string; tech_stack: string }[];
   skills: string[];
   certifications: string;
+  account_id?: string;
 }
 
-const ResumeDetails: React.FC = () => {
-  
-  const { account } = useAuth(); 
+const initialFormData: FormData = {
+  resumeName: "",
+  fullName: "",
+  email: "",
+  phone: "",
+  linkedin: "",
+  github: "",
+  portfolio: "",
+  education: [{ institution: "", degree: "", duration: "" }],
+  experience: [{ company: "", role: "", duration: "", responsibilities: "" }],
+  projects: [{ title: "", description: "", tech_stack: "" }],
+  skills: [],
+  certifications: "",
+};
+
+const ResumeDetails = () => {
+  const { account } = useAuth();
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState<FormData>({
-    account_id: account?._id  || "",
-    resumeName: "",
-    fullName: "",
-    email: "",
-    phone: "",
-    linkedin: "",
-    github: "",
-    portfolio: "",
-    education: [{ institution: "", degree: "", duration: "" }],
-    experience: [{ company: "", role: "", duration: "", responsibilities: "" }],
-    projects: [{ title: "", description: "", tech_stack: "" }],
-    skills: [],
-    certifications: "",
-  });
-
+  const { id } = useParams();
+  console.log("Resume ID:", id);
+  const { rowData } = useModalStore();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [formData, setFormData] = useState<FormData>({ ...initialFormData, account_id: account?._id || "" });
 
   useEffect(() => {
-    if (account?._id) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        account_id: account._id, 
-      }));
-    }
+    if (account?._id) setFormData((prev) => ({ ...prev, account_id: account._id }));
   }, [account]);
-  
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id && rowData) {
+      setFormData((prev) => ({ ...prev, ...rowData }));
+    }
+  }, [id, rowData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index?: number,
     fieldName?: keyof FormData
   ) => {
-    if (index !== undefined && fieldName) {
-      const updatedFieldData = [...(formData[fieldName] as any[])];
-      updatedFieldData[index] = { ...updatedFieldData[index], [e.target.name]: e.target.value };
-      setFormData({ ...formData, [fieldName]: updatedFieldData });
-    } else if (e.target.name === "skills") {
-      // Handle comma separated skills input
-      const updatedSkills = e.target.value.split(',').map(skill => skill.trim());
-      setFormData({ ...formData, skills: updatedSkills });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      if (index !== undefined && fieldName) {
+        const updatedField = [...prev[fieldName] as any[]];
+        updatedField[index] = { ...updatedField[index], [name]: value };
+        return { ...prev, [fieldName]: updatedField };
+      }
+      return { ...prev, [name]: name === "skills" ? value.split(",").map((s) => s.trim()) : value };
+    });
   };
 
-  const handleAddEntry = (fieldName: keyof FormData, entry: any) => {
-    setFormData({ ...formData, [fieldName]: [...(formData[fieldName] as any[]), entry] });
-  };
-
-  const handleRemoveEntry = (fieldName: keyof FormData, index: number) => {
-    const updatedFieldData = [...(formData[fieldName] as any[])];
-    updatedFieldData.splice(index, 1);
-    setFormData({ ...formData, [fieldName]: updatedFieldData });
+  const handleEntry = (fieldName: keyof FormData, action: string, index?: number) => {
+    setFormData((prev) => {
+      const updatedField = [...prev[fieldName] as any[]];
+      if (action === "add") updatedField.push(Object.fromEntries(Object.keys(updatedField[0]).map((k) => [k, ""])));
+      else updatedField.splice(index!, 1);
+      return { ...prev, [fieldName]: updatedField };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Data Being Sent:", formData);
     try {
-      const response = await axios.post("http://localhost:8080/api/submit", formData);
-      console.log("Resume Data Submitted:", response.data);
+      await axios.post("http://localhost:8080/api/submit", formData);
       alert("Resume details submitted successfully!");
-    } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || "An error occurred while submitting your resume details.");
-      console.error("Error submitting resume data:", error);
+      navigate("/resume-builder");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(error.response?.data?.message || "An error occurred while submitting your resume.");
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
     }
-    navigate('/resume-builder');
-    
   };
 
-  const handleAddProject = () => {
-    const newProject = { title: "", description: "", tech_stack: "" };
-    handleAddEntry("projects", newProject);
-  };
+  const renderDynamicFields = (fieldName: keyof FormData, label: string) => (
+    <Accordion key={fieldName}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography variant="h6">{label}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        {(formData[fieldName] as any[]).map((item, index) => (
+          <Grid container key={index}>
+            {Object.keys(item).map((key) => (
+              <Grid size={{ xs: 12, md: 10 }} key={key}>
+                <TextField
+                  fullWidth
+                  label={key}
+                  name={key}
+                  value={item[key]}
+                  onChange={(e) => handleChange(e, index, fieldName)}
+                  required
+                />
+              </Grid>
+            ))}
+            <Grid size={{ xs: 12, md: 10 }}>
+              <IconButton onClick={() => handleEntry(fieldName, "remove", index)}>
+                <DeleteIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+        ))}
+        <Button fullWidth variant="outlined" onClick={() => handleEntry(fieldName, "add")}>
+          Add More {label}
+        </Button>
+      </AccordionDetails>
+    </Accordion>
+  );
 
   return (
     <Container maxWidth="md">
-      <Box sx={{ textAlign: "center", my: 3 }}>
+      <Box textAlign="center" my={3}>
         <Typography variant="h4" gutterBottom>
           Resume Details
         </Typography>
-        <Typography variant="body1">
-          Please fill in the following details to generate your resume.
-        </Typography>
+        <Typography variant="body1">Fill in the details to generate your resume.</Typography>
       </Box>
 
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField fullWidth label="Resume Name" name="resumeName" value={formData.resumeName} onChange={handleChange} required />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth label="Full Name" name="fullName" value={formData.fullName} onChange={handleChange} required />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth type="email" label="Email" name="email" value={formData.email} onChange={handleChange} required />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth type="tel" label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} required />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth type="url" label="LinkedIn Profile" name="linkedin" value={formData.linkedin} onChange={handleChange} required />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth type="url" label="GitHub Profile" name="github" value={formData.github} onChange={handleChange} required />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField fullWidth type="url" label="Portfolio Website" name="portfolio" value={formData.portfolio} onChange={handleChange} required/>
+          {["resumeName", "fullName", "email", "phone", "linkedin", "github", "portfolio"].map((field) => (
+            <Grid size={{ xs: 12, md: 10 }} key={field}>
+              <TextField fullWidth label={field} name={field} value={formData[field as keyof FormData] as string} onChange={handleChange} required />
+            </Grid>
+          ))}
+          <Grid size={{ xs: 12, md: 10 }}>
+          {renderDynamicFields("education", "Education")}
+          {renderDynamicFields("experience", "Experience")}
+          {renderDynamicFields("projects", "Projects")}
           </Grid>
 
-          {/* Education Section */}
-          <Grid item xs={12}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">Education</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {formData.education.map((edu, index) => (
-                  <Grid container spacing={2} key={index}>
-                    <Grid item xs={12}><TextField fullWidth label="Institution" name="institution" value={edu.institution} required onChange={(e) => handleChange(e, index, "education")} /></Grid>
-                    <Grid item xs={12}><TextField fullWidth label="Degree" name="degree" value={edu.degree} required onChange={(e) => handleChange(e, index, "education")} /></Grid>
-                    <Grid item xs={12}><TextField fullWidth label="Duration" name="duration" value={edu.duration} required onChange={(e) => handleChange(e, index, "education")} /></Grid>
-                    <IconButton onClick={() => handleRemoveEntry("education", index)}><DeleteIcon /></IconButton>
-                  </Grid>
-                ))}
-                <Button fullWidth variant="outlined" onClick={() => handleAddEntry("education", { institution: "", degree: "", duration: "" })}>
-                  Add More Education
-                </Button>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-
-          {/* Work Experience Section */}
-          <Grid item xs={12}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">Work Experience</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {formData.experience.map((exp, index) => (
-                  <Grid container spacing={2} key={index}>
-                    <Grid item xs={12}><TextField fullWidth label="Company" name="company" value={exp.company} required onChange={(e) => handleChange(e, index, "experience")} /></Grid>
-                    <Grid item xs={12}><TextField fullWidth label="Role" name="role" value={exp.role} required onChange={(e) => handleChange(e, index, "experience")} /></Grid>
-                    <Grid item xs={12}><TextField fullWidth label="Duration" name="duration" value={exp.duration} required onChange={(e) => handleChange(e, index, "experience")} /></Grid>
-                    <Grid item xs={12}><TextField fullWidth label="Responsibilities" name="responsibilities" value={exp.responsibilities} required onChange={(e) => handleChange(e, index, "experience")} /></Grid>
-                    <IconButton onClick={() => handleRemoveEntry("experience", index)}><DeleteIcon /></IconButton>
-                  </Grid>
-                ))}
-                <Button fullWidth variant="outlined" onClick={() => handleAddEntry("experience", { company: "", role: "", duration: "", responsibilities: "" })}>
-                  Add More Experience
-                </Button>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-
-          {/* Projects Section */}
-          <Grid item xs={12}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">Projects</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {formData.projects.map((proj, index) => (
-                  <Grid container spacing={2} key={index}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Project Title"
-                        name="title"
-                        value={proj.title}
-                        onChange={(e) => handleChange(e, index, "projects")}
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Project Description"
-                        name="description"
-                        value={proj.description}
-                        onChange={(e) => handleChange(e, index, "projects")}
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Tech Stack"
-                        name="tech_stack"
-                        value={proj.tech_stack}
-                        onChange={(e) => handleChange(e, index, "projects")}
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                    <IconButton onClick={() => handleRemoveEntry("projects", index)}><DeleteIcon /></IconButton>
-                    </Grid>
-                  </Grid>
-                ))}
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleAddProject}
-                >
-                  Add More Projects
-                </Button>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-
-          {/* Skills Section */}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12, md: 10 }}>
             <TextField
               fullWidth
               label="Technical Skills (comma separated)"
               name="skills"
-              value={formData.skills.join(", ")} // Display as comma-separated string
-              onChange={handleChange} // Handle input change
+              value={formData.skills.join(", ")}
+              onChange={handleChange}
               required
             />
           </Grid>
-
-          <Grid item xs={12}>
-            <TextField fullWidth label="Certifications" name="certifications" value={formData.certifications} onChange={handleChange} required />
+          <Grid size={{ xs: 12, md: 10 }}>
+            <TextField
+              fullWidth
+              label="Certifications"
+              name="certifications"
+              value={formData.certifications}
+              onChange={handleChange}
+              required
+            />
           </Grid>
-          
-          <Grid item xs={12}>
-            <Button fullWidth variant="contained" color="primary" type="submit">Submit</Button>
+          <Grid size={{ xs: 12, md: 10 }}>
+            <Button fullWidth variant="contained" color="primary" type="submit">
+              Submit
+            </Button>
           </Grid>
         </Grid>
       </form>
 
-      {errorMessage && <Typography color="error" variant="body2" sx={{ mt: 2 }}>{errorMessage}</Typography>}
+      {errorMessage && (
+        <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+          {errorMessage}
+        </Typography>
+      )}
     </Container>
   );
-}
+};
 
 export default ResumeDetails;
