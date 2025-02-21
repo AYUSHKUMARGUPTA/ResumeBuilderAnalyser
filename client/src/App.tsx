@@ -1,5 +1,4 @@
 import React from "react";
-import { useAuth } from "contexts/AuthContext";
 import AuthModal from "components/AuthModal";
 import ResumeBuilder from "pages/ResumeBuilder";
 import Header from "components/Header";
@@ -12,7 +11,6 @@ const App = () => {
     <Router>
       <Header />
       <div className="page-container">
-        <LoggedInStatus />
         <Routes>
           <Route path="/resume-builder" element={<ResumeBuilder />} />
           <Route path="/resume-analyzer" element={<UploadPage />} />
@@ -21,25 +19,6 @@ const App = () => {
         <AuthModal />
       </div>
     </Router>
-  );
-};
-
-const LoggedInStatus = () => {
-  const { isLoggedIn, account } = useAuth();
-
-  if (isLoggedIn && !!account) {
-    return (
-      <p>
-        Hey, {account.username}! I'm happy to let you know: you are
-        authenticated!
-      </p>
-    );
-  }
-
-  return (
-    <p>
-      Don't forget to start your backend server, and then authenticate yourself.
-    </p>
   );
 };
 

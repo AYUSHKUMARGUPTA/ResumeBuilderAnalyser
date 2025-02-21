@@ -4,6 +4,7 @@ import { styled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Grid from '@mui/material/Grid2';
+import { useAuth } from "contexts/AuthContext";
 const FeatureCard = styled(Card)(({ theme }) => ({
   maxWidth: 345,
   margin: theme.spacing(2),
@@ -15,7 +16,7 @@ const FeatureCard = styled(Card)(({ theme }) => ({
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-
+  const { isLoggedIn } = useAuth();
   const features = [
     {
       title: 'Resume Builder',
@@ -34,6 +35,10 @@ const Home: React.FC = () => {
     },
   ];
 
+  const handleNavigation = (route:string) => {
+    if(isLoggedIn)
+      navigate(route)
+  }
   return (
     <Container>
       <Box textAlign="center" my={4}>
@@ -59,7 +64,7 @@ const Home: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => navigate(feature.route)}
+                    onClick={() => {handleNavigation(feature.route)}}
                   >
                     Get Started
                   </Button>
