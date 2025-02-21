@@ -155,7 +155,7 @@ const ResumeDetails = () => {
         <Grid container spacing={2}>
           {["resumeName", "fullName", "email", "phone", "linkedin", "github", "portfolio"].map((field) => (
             <Grid size={{ xs: 12, md: 10 }} key={field}>
-              <TextField fullWidth label={field} name={field} value={formData[field as keyof FormData] as string} onChange={handleChange} required />
+              <TextField fullWidth label={field.charAt(0).toUpperCase() + field.slice(1)} name={field} value={formData[field as keyof FormData] as string} onChange={handleChange} required />
             </Grid>
           ))}
           <Grid size={{ xs: 12, md: 10 }}>
