@@ -74,13 +74,16 @@ const Header: React.FC<Props> = (props: Props) => {
     setMobileOpen((prevState) => !prevState);
   };
   const handleNavigation = (path: string) => {
-    navigate(path);
+    if(isLoggedIn && !!account){
+      navigate(path);
+    }
+  
     // setOpen(false);
   };
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        MUI
+        CareerCrafter
       </Typography>
       <Divider />
       <List>
