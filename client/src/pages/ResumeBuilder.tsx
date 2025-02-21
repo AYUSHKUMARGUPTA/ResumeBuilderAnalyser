@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import ResumeGrid from "./Grid"; // Ensure correct import
+
 import Button from "@mui/material/Button";
 import CreateIcon from "@mui/icons-material/Create";
 import { CircularProgress, Typography } from "@mui/material";
 import { useModalStore } from "store/useModalStore";
 import { GridColDef } from "@mui/x-data-grid";
 import jsPDF from "jspdf";
+import ResumeGrid from "components/Grid";
 interface Resume {
     resume_id: string;
     _id: string;
