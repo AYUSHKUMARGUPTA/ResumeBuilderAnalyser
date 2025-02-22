@@ -73,7 +73,8 @@ const ResumeBuilder: React.FC = () => {
   const handleCreateResume = () => {
     navigate("/resume-details");
   };
-  const handleDownloadResume = (row_data: Resume) => {
+  const handleDownloadResume = (row_data: Resume, event: React.MouseEvent) => {
+    event.stopPropagation();
     const pdf = new jsPDF();
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(18);
@@ -136,7 +137,8 @@ const ResumeBuilder: React.FC = () => {
     pdf.save(`${row_data.fullName}_Resume.pdf`);
   };
 
-  const handleDownloadPortfolio = async (row_data: Resume) => {
+  const handleDownloadPortfolio = async (row_data: Resume, event: React.MouseEvent) => {
+    event.stopPropagation();
     try {
       const portfolioContent = row_data;
 
@@ -170,8 +172,6 @@ const ResumeBuilder: React.FC = () => {
         });
       }
   
-    //   setResult(accumulatedResult);
-  
       // Create a Blob from the result state and trigger a download
       const blob = new Blob([accumulatedResult], { type: "text/html" });
       const url = URL.createObjectURL(blob);
@@ -204,7 +204,6 @@ const ResumeBuilder: React.FC = () => {
     return accumulatedResult;
   };
   const handleRowClick = (row_data: any) => {
-    console.log("Navigating to resume details with ID:", row_data);
     setRowData(row_data);
     navigate(`/resume-details/${row_data._id}`);
   };
@@ -214,28 +213,28 @@ const ResumeBuilder: React.FC = () => {
     {
       field: "downloadUrl",
       headerName: "Export Resume",
-      width: 150,
+      width: 200,
       renderCell: (params) => (
         <Button
           variant="contained"
           color="primary"
-          onClick={() => handleDownloadResume(params.row)}
+          onClick={(event) => handleDownloadResume(params.row, event)}
         >
-          Export
+          Export Resume
         </Button>
       ),
     },
     {
       field: "exportUrl",
       headerName: "Export Portfolio",
-      width: 150,
+      width: 200,
       renderCell: (params) => (
         <Button
           variant="contained"
           color="primary"
-          onClick={() => handleDownloadPortfolio(params.row)}
+          onClick={(event) => handleDownloadPortfolio(params.row, event)}
         >
-          Export
+          Export Portfolio
         </Button>
       ),
     },
