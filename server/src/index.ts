@@ -15,8 +15,7 @@ const bootstrap = async () => {
     res.status(204).end()
   })
 
-  app.use('/auth', authRoutes)
-  // add rest of routes here...
+  app.use('/auth', authRoutes);
 
   app.use('/api', apiRoutes);
 
