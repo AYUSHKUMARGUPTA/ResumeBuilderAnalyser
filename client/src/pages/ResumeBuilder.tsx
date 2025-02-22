@@ -37,11 +37,8 @@ const ResumeBuilder: React.FC = () => {
   const { setRowData } = useModalStore();
   const navigate = useNavigate();
   const [resumeData, setResumeData] = useState<Resume[]>([]);
-  // const [formData, setFormData] = useState<Resume | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-//   const [result, setResult] = useState("");
-  // Fetch account_id from localStorage
   const storedaccount_id = localStorage.getItem("_id");
   const account_id = storedaccount_id || null;
   console.log("Fetching account_id from localStorage:", account_id);
@@ -189,25 +186,6 @@ const ResumeBuilder: React.FC = () => {
       console.error("Error during streaming:", error);
     }
   };
-//   const streamResponse = async (
-//     reader: ReadableStreamDefaultReader<Uint8Array>,
-//     decoder: TextDecoder
-//   ) => {
-//     let done = false;
-//     let accumulatedResult = "";
-
-//     while (!done) {
-//       const { value, done: readerDone } = await reader.read();
-//       done = readerDone;
-//       const chunk = decoder.decode(value, { stream: true });
-
-//       const lines = chunk.split("\n");
-//       // eslint-disable-next-line no-loop-func
-//       lines.forEach((line) => {
-//         accumulatedResult = processLine(line, accumulatedResult);
-//       });
-//     }
-//   };
   const processLine = (line: string, accumulatedResult: string) => {
     if (line.startsWith("data:")) {
       const data = line.replace("data: ", "").trim();
@@ -218,7 +196,6 @@ const ResumeBuilder: React.FC = () => {
         const parsedData = JSON.parse(data);
         if (parsedData.response) {
           accumulatedResult += parsedData.response;
-        //   setResult(accumulatedResult);
         }
       } catch (err) {
         console.error("Error parsing JSON chunk:", err);
@@ -249,7 +226,7 @@ const ResumeBuilder: React.FC = () => {
       ),
     },
     {
-      field: "downloadUrl",
+      field: "exportUrl",
       headerName: "Export Portfolio",
       width: 150,
       renderCell: (params) => (

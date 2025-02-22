@@ -13,7 +13,7 @@ const portfolio: RequestHandler = async (req, res) => {
 
     The portfolio should target Software Development roles.
     The HTML file should be fully self-contained, including:
-    - CSS (for styling) within <style> tags
+    - CSS (for styling) within <style> tags, or inline styles
     - JavaScript (for interactivity) within <script> tags
     - No external dependencies (no separate CSS or JS files)
     - The content of the portfolio should be exactly based on the following details: ${JSON.stringify(portfolioContent)}, formatted properly in HTML.
@@ -26,7 +26,9 @@ const portfolio: RequestHandler = async (req, res) => {
     - Follow best practices for HTML and CSS, including semantic HTML elements and responsive design techniques.
     - Ensure the CSS includes styles for typography, layout, and color scheme that are visually appealing and consistent.
     - Use CSS Flexbox or Grid for layout to ensure the portfolio is responsive and looks good on all devices.
-    - Background colors, fonts, and other design elements should be chosen to create a visually appealing and professional portfolio.
+    - Make sure to add Background colors, fonts, and other design elements should be chosen to create a visually appealing and professional portfolio.
+    - After every time whenever a user refreshes a page, if the provided content is same, then always give same result. 
+
     The response must contain only the complete HTML file—no explanations, placeholders, or additional text.
     `;
 
