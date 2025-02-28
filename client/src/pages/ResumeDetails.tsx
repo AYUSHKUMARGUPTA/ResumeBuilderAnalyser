@@ -99,7 +99,7 @@ const ResumeDetails = () => {
       await axios.post("http://localhost:8080/api/submit", formData);
       alert("Resume details submitted successfully!");
       navigate("/resume-builder");
-    } catch (error) {
+    } catch (error: any) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.response?.data?.message || "An error occurred while submitting your resume.");
       } else {

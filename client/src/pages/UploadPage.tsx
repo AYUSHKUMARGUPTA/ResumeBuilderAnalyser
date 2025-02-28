@@ -7,8 +7,8 @@ import TextField from "@mui/material/TextField";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import "../styles/upload.css";
-import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
+import Box from "@mui/material/Box";
+import LinearProgress from "@mui/material/LinearProgress";
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -93,16 +93,13 @@ const UploadPage = () => {
 
       setIsLoading(true);
 
-      const response = await fetch(
-        "http://localhost:8080/api/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ jd, extractedText }),
-        }
-      );
+      const response = await fetch("http://localhost:8080/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ jd, extractedText }),
+      });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -124,39 +121,42 @@ const UploadPage = () => {
   return (
     <div>
       <h2>Upload Your Resume</h2>
-      <div className="upload-form-container">
-        <TextField
-          id="outlined-multiline-static"
-          label="JD"
-          multiline
-          value={jdText}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setInputText(e.target.value)
-          }
-        />
-        <Button
-          component="label"
-          role={undefined}
-          variant="contained"
-          tabIndex={-1}
-          startIcon={<CloudUploadIcon />}
-        >
-          Upload files
-          <VisuallyHiddenInput
-            type="file"
-            accept=".pdf,.doc,.docx"
-            onChange={handleAnalyze}
-            multiple={false}
+
+      <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+        <div className="upload-form-container">
+          <TextField
+            id="outlined-multiline-static"
+            label="JD"
+            multiline
+            value={jdText}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setInputText(e.target.value)
+            }
           />
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<QueryStatsIcon />}
-          onClick={analyze}
-        >
-          Analyze
-        </Button>
-      </div>
+          <Button
+            component="label"
+            role={undefined}
+            variant="contained"
+            tabIndex={-1}
+            startIcon={<CloudUploadIcon />}
+          >
+            Upload files
+            <VisuallyHiddenInput
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={handleAnalyze}
+              multiple={false}
+            />
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<QueryStatsIcon />}
+            onClick={analyze}
+          >
+            Analyze
+          </Button>
+        </div>
+      </Box>
       {isLoading && (
         <Box sx={{ width: "100%" }}>
           <LinearProgress />
