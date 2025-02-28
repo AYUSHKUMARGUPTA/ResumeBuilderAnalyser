@@ -4,11 +4,12 @@ import axios from "axios";
 
 import Button from "@mui/material/Button";
 import CreateIcon from "@mui/icons-material/Create";
-import { CircularProgress, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useModalStore } from "store/useModalStore";
 import { GridColDef } from "@mui/x-data-grid";
 import jsPDF from "jspdf";
 import ResumeGrid from "components/Grid";
+import FullPageCircularProgress from "components/Loader";
 interface Resume {
   resume_id: string;
   _id: string;
@@ -74,6 +75,7 @@ const ResumeBuilder: React.FC = () => {
     navigate("/resume-details");
   };
   const handleDownloadResume = (row_data: Resume, event: React.MouseEvent) => {
+    setLoading(true);
     event.stopPropagation();
     const pdf = new jsPDF();
     pdf.setFont("helvetica", "bold");
@@ -135,10 +137,12 @@ const ResumeBuilder: React.FC = () => {
     pdf.text(row_data.certifications, 10, yOffset);
 
     pdf.save(`${row_data.fullName}_Resume.pdf`);
+    setLoading(false);
   };
 
   const handleDownloadPortfolio = async (row_data: Resume, event: React.MouseEvent) => {
     event.stopPropagation();
+    setLoading(true);
     try {
       const portfolioContent = row_data;
 
@@ -184,6 +188,8 @@ const ResumeBuilder: React.FC = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error during streaming:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const processLine = (line: string, accumulatedResult: string) => {
@@ -245,12 +251,12 @@ const ResumeBuilder: React.FC = () => {
         variant="contained"
         startIcon={<CreateIcon />}
         onClick={handleCreateResume}
-        sx={{ mb: 2 }} // Adds margin below button
+        sx={{ mb: 2, mt:1 }} // Adds margin below button
       >
         Create New Resume
       </Button>
 
-      {loading && <CircularProgress />}
+      {loading && <FullPageCircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
       {!loading && !error && resumeData.length > 0 && (
         <ResumeGrid

@@ -15,7 +15,7 @@ import {
 import Grid from '@mui/material/Grid2';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useModalStore } from "store/useModalStore";
 
 interface FormData {
@@ -99,7 +99,7 @@ const ResumeDetails = () => {
       await axios.post("http://localhost:8080/api/submit", formData);
       alert("Resume details submitted successfully!");
       navigate("/resume-builder");
-    } catch (error) {
+    } catch (error:AxiosError | any) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.response?.data?.message || "An error occurred while submitting your resume.");
       } else {

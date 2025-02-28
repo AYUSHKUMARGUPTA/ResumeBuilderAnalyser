@@ -49,11 +49,15 @@ const Home: React.FC = () => {
           Enhance your career with our tools
         </Typography>
       </Box>
-      <Grid container justifyContent="center">
+      <Grid container justifyContent="center" spacing={2}>
         {features.map((feature, index) => (
-          <Grid key={index} component={motion.div} whileHover={{ scale: 1.1 }}>
-            <FeatureCard style={{height: '100%'}}>
-              <CardContent  style={{height: '100%'}}>
+          <Grid
+            key={index} size={{xs: 12, sm: 6, md: 4}}
+            component={motion.div}
+            whileHover={{ scale: 1.1 }}
+          >
+            <FeatureCard style={{ height: '100%' }}>
+              <CardContent style={{ height: '100%' }}>
                 <Typography variant="h5" component="h2">
                   {feature.title}
                 </Typography>
@@ -64,7 +68,9 @@ const Home: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => {handleNavigation(feature.route)}}
+                    onClick={() => {
+                      handleNavigation(feature.route);
+                    }}
                   >
                     Get Started
                   </Button>
