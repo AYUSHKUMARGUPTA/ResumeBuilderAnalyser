@@ -9,27 +9,30 @@ const portfolio: RequestHandler = async (req, res) => {
     }
 
     const prompt = `
-    You are an advanced and highly experienced Portfolio Builder specializing in the tech industry. Your task is to generate a fully functional, single-file HTML portfolio that is visually appealing and competitive in the job market.
+    You are an expert Portfolio Builder specializing in tech industry portfolios. Your task is to generate a fully functional, single-file HTML portfolio optimized for Software Development roles.
 
-    The portfolio should target Software Development roles.
-    The HTML file should be fully self-contained, including:
-    - CSS (for styling) within <style> tags, or inline styles
-    - JavaScript (for interactivity) within <script> tags
-    - No external dependencies (no separate CSS or JS files)
-    - The content of the portfolio should be exactly based on the following details: ${JSON.stringify(portfolioContent)}, formatted properly in HTML.
-    - The design should be modern, professional, and responsive.
-    - Include sections for About, Projects, Skills, Education, Experience, Certifications, and Contact. Each section should be clearly labeled and visually distinct.
-    - Each section should have relevant content based on the provided details.
-    - Use placeholder images and text where necessary, but ensure the structure is complete.
-    - Ensure that the HTML is well-formed and valid.
-    - Replace placeholders with actual content from the provided details.
-    - Follow best practices for HTML and CSS, including semantic HTML elements and responsive design techniques.
-    - Ensure the CSS includes styles for typography, layout, and color scheme that are visually appealing and consistent.
-    - Use CSS Flexbox or Grid for layout to ensure the portfolio is responsive and looks good on all devices.
-    - Make sure to add Background colors, fonts, and other design elements should be chosen to create a visually appealing and professional portfolio.
-    - After every time whenever a user refreshes a page, if the provided content is same, then always give same result. 
+        Requirements:
+        - Generate a fully self-contained HTML file that includes:
+        - CSS (for styling) inside <style> tags.
+        - JavaScript (for interactivity) inside <script> tags.
+        - No external dependencies (no separate CSS or JS files).
+        - The content must be exactly based on the provided details, formatted properly in HTML:
+        ${JSON.stringify(portfolioContent)}
+        - Ensure a modern, professional, and responsive design.
+        - Use semantic HTML, CSS Flexbox or Grid, and consistent typography & colors.
+        - The output must be deterministic—for the same input, the portfolio should always render identically.
 
-    The response must contain only the complete HTML file—no explanations, placeholders, or additional text.
+        Styling & Design:
+            Typography: Professional and readable fonts.
+            Color Scheme: Consistent and visually appealing.
+            Layout: CSS Grid or Flexbox for responsiveness.
+            Effects: Hover effects, smooth scrolling, and interactive navigation.
+            Call-to-Action: Buttons for Contact & Project Links.
+
+        Response Format:
+            Output only the complete HTML file—no explanations, comments, or placeholders.
+            The generated HTML must be valid and properly structured.
+            Ensure consistent output across multiple runs for the same input.
     `;
 
     try {
