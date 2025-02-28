@@ -163,21 +163,19 @@ const ResumeBuilder: React.FC = () => {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let accumulatedResult = "";
+      let accResult:any = "";
   
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n");
-  
-        lines.forEach((line) => {
-          accumulatedResult = processLine(line, accumulatedResult);
-        });
+
+        accResult = lines.reduce((acc, line) => processLine(line, acc), accResult);
       }
   
       // Create a Blob from the result state and trigger a download
-      const blob = new Blob([accumulatedResult], { type: "text/html" });
+      const blob = new Blob([accResult], { type: "text/html" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
