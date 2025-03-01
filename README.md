@@ -1,6 +1,8 @@
-# MERN Stack Template
+# Career Crafter - Resume Builder, Analyzer, Portfolio Builder
 
-<img src='https://raw.githubusercontent.com/BenElferink/mern-template/refs/heads/images/images/mern.jpeg' />
+## MERN Stack Template
+
+<img src='https://images.prismic.io/loco-blogs/79328284-f97b-489f-924c-eb3b17e34b56_image2.png?auto=compress%2Cformat&rect=0%2C0%2C1999%2C1124&w=1920&h=1080&ar=1.91%3A1' />
 
 - **M** = [MongoDB](https://www.mongodb.com)
 - **E** = [Express.js](https://expressjs.com)
@@ -9,24 +11,27 @@
 
 <br />
 
-# What is this template?
+## Input
 
-This template allows you to quick-start your Fullstack application using the MERN stack, it has a server setup with some basic authentication, and a client ready to communicate with the backend.
+CareerCrafter requires users to log in before interacting with the system. Once authenticated, users can manually enter resume details such as Education, Experience, and Skills. Alternatively, they can upload an existing resume and provide a job description for analysis.
 
-<img src='https://raw.githubusercontent.com/BenElferink/mern-template/refs/heads/images/images/preview.png' />
 
-<br />
+## Process
 
-# How to use this template
+The application processes user inputs in two key ways:
 
-### 1. Generate repository from template:
+- Resume Builder – Users enter resume details, and AI assists in structuring the content. They can export the resume or generate a portfolio.
+- Resume Analyzer – Upon uploading a resume and entering a job description, AI evaluates the resume against ATS criteria, generating an ATS score and personalized improvement suggestions. The backend, powered by Node.js and Express, manages data storage and processing, while MongoDB holds user details.
 
-Click ["Use this template"](https://github.com/benelferink/mern-template/generate) to generate a
-new repo, then open your terminal and clone your new repo.
+## Output
 
-```
-git clone https://github.com/[your_user_name]/[your_repo_name].git
-```
+CareerCrafter generates a well-structured resume and an AI-powered portfolio. Additionally, the Resume Analyzer provides ATS compatibility scores and recommendations, helping users optimize their applications for better job prospects.
+
+![Home](./Home.png)
+![ResumeDetails](./ResumeDetails.png)
+![ResumeBuilder](./ResumeBuilder.png)
+![ResumeAnalyzer](./ResumeAnalyzer.png)
+![ExtractedPortfolio](./ExtractedPortfolio.png)
 
 ### 2. Install dependencies:
 
@@ -49,6 +54,11 @@ npm i
 Prepare your MongoDB database (using [Atlas](https://www.mongodb.com/cloud/atlas),
 or [Community](<https://github.com/benelferink/mern-template/wiki/Install-MongoDB-Community-Server-(MacOS)>)). Then configure your database within `server/src/constants/index.js` (or `server/src/.env`), by configuring the `MONGO_URI` variable.
 
+```
+MONGO_URI=mongodb+srv://<username>:<password>@resumetool.t63b2.mongodb.net/resume_tool?retryWrites=true&w=majority&appName=ResumeTool
+```
+** Note - Replace Username and Password
+
 ### 4. Start applications:
 
 Go to the `server` folder, and run `dev`.
@@ -65,4 +75,4 @@ cd ./client
 npm run dev
 ```
 
-### 5. Happy Coding !!!
+
