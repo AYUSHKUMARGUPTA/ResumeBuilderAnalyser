@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "/",
-  "author": "Ben Elferink <ben.elferink@icloud.com> (https://github.com/BenElferink)",
+  "author": "Ayush Kumar Gupts <ayushkg97@gmail.com> (https://github.com/AYUSHKUMARGUPTA)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/BenElferink/mern-template.git"
+    "url": "https://github.com/AYUSHKUMARGUPTA/ResumeBuilderAnalyser.git"
   },
   "bugs": {
-    "url": "https://github.com/BenElferink/mern-template/issues",
-    "email": "ben.elferink@icloud.com"
+    "url": "https://github.com/AYUSHKUMARGUPTA/ResumeBuilderAnalyser/issues",
+    "email": "ayushkg97@gmail.com"
   },
   "scripts": {},
   "dependencies": {
