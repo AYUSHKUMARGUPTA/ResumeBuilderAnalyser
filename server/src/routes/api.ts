@@ -5,10 +5,11 @@ import { getResume } from "../controllers/resume/getResume";
 import { updateResume } from "../controllers/resume/updateResume";
 import checkBearerToken from "../middlewares/check-bearer-token";
 import { getResumeById } from "../controllers/resume/getResumeById"; 
+import portfolio from '../controllers/portfolio';
 const router = express.Router();
 
 router.post('/analyze', [], analyze);
-
+router.post('/portfolio', [], portfolio);
 router.post("/submit", async (req: Request, res: Response, next: NextFunction) => {
     try {
       await submitResume(req, res, next);

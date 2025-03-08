@@ -99,7 +99,7 @@ const ResumeDetails = () => {
       await axios.post("http://localhost:8080/api/submit", formData);
       alert("Resume details submitted successfully!");
       navigate("/resume-builder");
-    } catch (error) {
+    } catch (error: any) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.response?.data?.message || "An error occurred while submitting your resume.");
       } else {
@@ -116,12 +116,12 @@ const ResumeDetails = () => {
       <AccordionDetails>
         {(formData[fieldName] as any[]).map((item, index) => (
           <Grid container key={index}>
-            {Object.keys(item).map((key) => (
+            {Object.keys(item).filter(key => key !== '_id').map((key) => (
               <Grid size={{ xs: 12, md: 10 }} key={key}>
                 <TextField
                   fullWidth
-                  label={key}
-                  name={key}
+                  label={key[0].toUpperCase() + key.slice(1)}
+                  name={key[0].toUpperCase() + key.slice(1)}
                   value={item[key]}
                   onChange={(e) => handleChange(e, index, fieldName)}
                   required
