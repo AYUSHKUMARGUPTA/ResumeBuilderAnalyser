@@ -56,6 +56,7 @@
 - Namrata: Prepare final progress report.
 - Ayush: Commit final GitHub repository.
 - Vidyasagar: Review and refine project documentation.
+---
 
 ##### **Meeting 5 - February 26, 2025**  
 **Agenda:**  
@@ -67,5 +68,17 @@
 
 **Action Items:**  
 - Namrata: Finalize progress report and presentation.
+- Ayush: Performing Smoke Testing ad fixing bugs.
+- Vidyasagar: Fixing UI cosmetics bugs.
+---
+
+##### **Meeting 6 - March 5, 2025**  
+**Agenda:**  
+- Reviewed Project report and presentation.
+- Fixed Pdf format.
+- Cleaning up the testing data.
+
+**Action Items:**  
+- Namrata: Fixed Resume Pdf format and finalizing report.
 - Ayush: Performing Smoke Testing ad fixing bugs.
 - Vidyasagar: Fixing UI cosmetics bugs.
