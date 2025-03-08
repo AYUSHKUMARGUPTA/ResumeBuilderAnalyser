@@ -10,29 +10,6 @@ import { GridColDef } from "@mui/x-data-grid";
 import jsPDF from "jspdf";
 import ResumeGrid from "components/Grid";
 import FullPageCircularProgress from "components/Loader";
-interface Resume {
-  resume_id: string;
-  _id: string;
-  downloadUrl: string;
-  resumeName: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  linkedin: string;
-  github: string;
-  portfolio: string;
-  education: { institution: string; degree: string; duration: string }[];
-  experience: {
-    company: string;
-    role: string;
-    duration: string;
-    responsibilities: string;
-  }[];
-  projects: { title: string; description: string; tech_stack: string }[];
-  skills: string[];
-  certifications: string;
-  account_id?: string;
-}
 
 const ResumeBuilder: React.FC = () => {
   const { setRowData } = useModalStore();
@@ -74,72 +51,200 @@ const ResumeBuilder: React.FC = () => {
   const handleCreateResume = () => {
     navigate("/resume-details");
   };
-  const handleDownloadResume = (row_data: Resume, event: React.MouseEvent) => {
-    setLoading(true);
-    event.stopPropagation();
-    const pdf = new jsPDF();
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(18);
-    pdf.text(row_data.fullName, 10, 20);
+  
+// Define proper types for the Resume structure
+interface Education {
+  degree: string;
+  institution: string;
+  duration: string;
+}
 
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "normal");
-    pdf.text(`Email: ${row_data.email}`, 10, 30);
-    pdf.text(`Phone: ${row_data.phone}`, 10, 40);
-    pdf.text(`LinkedIn: ${row_data.linkedin}`, 10, 50);
-    pdf.text(`GitHub: ${row_data.github}`, 10, 60);
-    pdf.text(`Portfolio: ${row_data.portfolio}`, 10, 70);
+interface Experience {
+  role: string;
+  company: string;
+  duration: string;
+  responsibilities: string | string[];
+}
 
-    let yOffset = 80;
+interface Resume {
+  fullName: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  github: string;
+  portfolio: string;
+  education: Education[];
+  skills: string[];
+  experience: Experience[];
+  certifications: string | string[];
+}
 
-    // Education Section
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Education", 10, yOffset);
-    pdf.setFont("helvetica", "normal");
-    yOffset += 10;
-    row_data.education.forEach((edu) => {
-      pdf.text(
-        `${edu.degree}, ${edu.institution} (${edu.duration})`,
-        10,
-        yOffset
-      );
-      yOffset += 10;
-    });
-
-    // Skills Section
-    yOffset += 10;
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Technical Skills", 10, yOffset);
-    pdf.setFont("helvetica", "normal");
-    yOffset += 10;
-    pdf.text(row_data.skills.join(", "), 10, yOffset);
-    yOffset += 10;
-
-    // Experience Section
-    yOffset += 10;
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Experience", 10, yOffset);
-    pdf.setFont("helvetica", "normal");
-    yOffset += 10;
-    row_data.experience.forEach((exp) => {
-      pdf.text(`${exp.role}, ${exp.company} (${exp.duration})`, 10, yOffset);
-      yOffset += 6;
-      pdf.text(exp.responsibilities, 10, yOffset, { maxWidth: 180 });
-      yOffset += 12;
-    });
-
-    // Certifications Section
-    yOffset += 10;
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Certifications", 10, yOffset);
-    pdf.setFont("helvetica", "normal");
-    yOffset += 10;
-    pdf.text(row_data.certifications, 10, yOffset);
-
-    pdf.save(`${row_data.fullName}_Resume.pdf`);
-    setLoading(false);
+const handleDownloadResume = (row_data: Resume, event: React.MouseEvent) => {
+  setLoading(true);
+  event.stopPropagation();
+  
+  const pdf = new jsPDF();
+  const { width: pageWidth } = pdf.internal.pageSize;
+  const margin = 15;
+  const contentWidth = pageWidth - (margin * 2);
+  let y = 20; // Current y position
+  
+  // Utility functions
+  const safeText = (text: any): string => text ? String(text).trim() : '';
+  
+  const addText = (text: string, x: number, fontSize = 11, isBold = false) => {
+    pdf.setFontSize(fontSize);
+    pdf.setFont("helvetica", isBold ? "bold" : "normal");
+    pdf.text(safeText(text), x, y);
   };
-
+  
+  const addSection = (title: string) => {
+    // Reduced spacing before section headings
+    y += 3;
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.text(title, margin, y);
+    pdf.line(margin, y + 2, pageWidth - margin, y + 2);
+    y += 8; // Reduced spacing after section heading
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal");
+  };
+  
+  const addBullet = (text: string, indent = 0) => {
+    if (!text || !text.trim()) return;
+    
+    const bulletX = margin + indent;
+    const textX = bulletX + 5;
+    const wrappedText = pdf.splitTextToSize(text, contentWidth - textX);
+    
+    pdf.text("•", bulletX, y);
+    pdf.text(wrappedText, textX, y);
+    y += wrappedText.length * 5;
+  };
+  
+  const addRightAligned = (text: string) => {
+    const textWidth = pdf.getStringUnitWidth(text) * pdf.getFontSize() / pdf.internal.scaleFactor;
+    pdf.text(text, pageWidth - margin - textWidth, y);
+  };
+  
+  // Process responsibilities into an array of strings
+  const getResponsibilities = (resp: string | string[]): string[] => {
+    if (typeof resp === 'string') {
+      return resp.split('.')
+        .map(item => item.trim())
+        .filter(item => item.length > 0)
+        .map(item => item.endsWith('.') ? item : `${item}.`);
+    }
+    return Array.isArray(resp) ? resp.map(safeText) : [String(resp)];
+  };
+  
+  // Process array or string to array
+  const toArray = (value: string | string[]): string[] => {
+    if (typeof value === 'string') {
+      return value.split(',').map(item => item.trim()).filter(Boolean);
+    }
+    return Array.isArray(value) ? value.map(safeText) : [String(value)];
+  };
+  
+  // 1. Name (centered, large)
+  addText(row_data.fullName, (pageWidth - pdf.getStringUnitWidth(safeText(row_data.fullName)) * 20 / pdf.internal.scaleFactor) / 2, 20, true);
+  y += 8; // Reduced spacing after name
+  
+  // 2. Contact information
+  pdf.setFontSize(10);
+  const contactFields = [
+    { label: 'Email', value: row_data.email },
+    { label: 'Phone', value: row_data.phone },
+    { label: 'LinkedIn', value: row_data.linkedin },
+    { label: 'GitHub', value: row_data.github },
+    { label: 'Portfolio', value: row_data.portfolio }
+  ].filter(field => field.value);
+  
+  if (contactFields.length >= 4) {
+    // Two column layout
+    const mid = Math.ceil(contactFields.length / 2);
+    for (let i = 0; i < mid; i++) {
+      pdf.text(`${contactFields[i].label}: ${safeText(contactFields[i].value)}`, margin, y + (i * 5)); // Tighter spacing
+    }
+    
+    for (let i = 0; i < contactFields.length - mid; i++) {
+      pdf.text(`${contactFields[i + mid].label}: ${safeText(contactFields[i + mid].value)}`, pageWidth / 2, y + (i * 5)); // Tighter spacing
+    }
+    
+    y += Math.max(mid, contactFields.length - mid) * 5 + 2; // Reduced padding after contact section
+  } else {
+    // Single column
+    contactFields.forEach(field => {
+      pdf.text(`${field.label}: ${safeText(field.value)}`, margin, y);
+      y += 5; // Tighter spacing
+    });
+    y += 2; // Reduced padding after contact section
+  }
+  
+  // 3. Education
+  if (row_data.education?.length) {
+    addSection("EDUCATION");
+    
+    row_data.education.forEach((edu, index) => {
+      addText(edu.degree, margin, 11, true);
+      y += 5;
+      addText(edu.institution, margin);
+      addRightAligned(edu.duration);
+      
+      // Less spacing if not the last education entry
+      y += (index === row_data.education.length - 1) ? 6 : 8;
+    });
+  }
+  
+  // 4. Skills
+  if (row_data.skills?.length) {
+    addSection("TECHNICAL SKILLS");
+    const skillsText = pdf.splitTextToSize(row_data.skills.map(safeText).join(" • "), contentWidth);
+    pdf.text(skillsText, margin, y);
+    y += skillsText.length * 5 + 2; // Reduced padding after skills
+  }
+  
+  // 5. Experience
+  if (row_data.experience?.length) {
+    addSection("PROFESSIONAL EXPERIENCE");
+    
+    row_data.experience.forEach((exp, index) => {
+      addText(exp.role, margin, 11, true);
+      y += 5;
+      addText(exp.company, margin);
+      addRightAligned(exp.duration);
+      y += 8; // Reduced spacing
+      
+      const responsibilities = getResponsibilities(exp.responsibilities);
+      responsibilities.forEach((item, i) => {
+        addBullet(item, 5);
+        // Less spacing between bullet points
+        if (i < responsibilities.length - 1) {
+          y -= 1; // Slightly decrease spacing between bullet points
+        }
+      });
+      
+      // Different spacing based on whether this is the last experience
+      y += (index === row_data.experience.length - 1) ? 3 : 5;
+    });
+  }
+  
+  // 6. Certifications
+  if (row_data.certifications) {
+    addSection("CERTIFICATIONS");
+    const certs = toArray(row_data.certifications);
+    certs.forEach((cert, i) => {
+      addBullet(cert);
+      // Less spacing between certification bullet points
+      if (i < certs.length - 1) {
+        y -= 1;
+      }
+    });
+  }
+  
+  pdf.save(`${safeText(row_data.fullName)}_Resume.pdf`);
+  setLoading(false);
+};
   const handleDownloadPortfolio = async (row_data: Resume, event: React.MouseEvent) => {
     event.stopPropagation();
     setLoading(true);
