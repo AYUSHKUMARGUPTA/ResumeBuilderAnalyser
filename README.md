@@ -32,6 +32,7 @@ CareerCrafter generates a well-structured resume and an AI-powered portfolio. Ad
 ![ResumeBuilder](./ResumeBuilder.png)
 ![ResumeAnalyzer](./ResumeAnalyzer.png)
 ![ExtractedPortfolio](./ExtractedPortfolio.png)
+![ExtractedResume](./ExtractedResume.png)
 
 ### 2. Install dependencies:
 
